@@ -46,9 +46,9 @@ class Main extends PluginBase implements Listener{
 
 	public function sendBossBar(){
 		if($this->eid === null) return;
+		$this->i++;
 		foreach($this->getServer()->getDefaultLevel()->getPlayers() as $player){
 			API::setTitle($this->getText($player), $this->eid);
-			API::setPercentage(100, $this->eid);
 		}
 	}
 
@@ -67,14 +67,14 @@ class Main extends PluginBase implements Listener{
 		if(!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . '
 
 ' . TextFormat::RESET;
-		$currentMSG = $this->cmessages[0];
+		$currentMSG = $this->cmessages[$this->i % count($this->cmessages)];
 		@preg_match_all("/(\{.*?\})/ig", $currentMSG, $maybepercentage);
 		// print_r($maybepercentage);
 		// preg_match_all('/(\{(\d+)%\})/i', $maybepercentage[0], $percentages);
 		// print_r($percentages);
 		if(strpos($currentMSG, '%') > -1){
 			$percentage = substr($currentMSG, 1, strpos($currentMSG, '%') - 1);
-			if(is_numeric($percentage)) API::setPercentage($percentage, $this->eid);
+			if(is_numeric($percentage)) API::setPercentage(intval($percentage) + 0.5, $this->eid);
 			$currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
 		}
 		$text .= $this->formatText($player, $currentMSG);
