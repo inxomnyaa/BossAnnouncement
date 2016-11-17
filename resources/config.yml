@@ -1,0 +1,32 @@
+---
+# Example Look #
+# First 3 seconds: #
+#
+# Welcome to the WolvesFortress.de Server, {player}!
+# ================----------------------------------
+#        The best server, the best minigames!
+#
+# Next 3 seconds: #
+#
+# Welcome to the WolvesFortress.de Server, {player}!
+# =================================-----------------
+#      Visit our website: wolvesfortress.de!
+#
+# If you don't define the top message, the changing messages will be displayed there. #
+
+#         Changing messages are up here :P
+# ==================================================
+head-message: "We use BossAnnouncement by XenialDan!"
+# Changing messages are here
+# To set the percentage of the bar add {number%} before the message!
+# Otherwise it takes the percentage that was there before.
+# Example for a 25% filled: "{25%}This is a quarter filled bar >>"
+changing-messages:
+ - "{0%}{BOLD}{AQUA}Twitter{RESET}: XenialDan"
+ - "{25%}{BOLD}{BLACK}You{RED}Tube{RESET}: XenialDan"
+ - "{50%}{BOLD}{BLACK}GitHub{RESET}: XenialDan"
+ - "{75%}{BOLD}Instagram{RESET}: XenialDan"
+ - "{100%}{BOLD}PM-Forums{RESET}: thebigsmileXD"
+# How fast the messages switch in seconds
+change-speed: 5
+...
