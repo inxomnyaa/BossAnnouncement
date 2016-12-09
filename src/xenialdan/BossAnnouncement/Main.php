@@ -53,7 +53,9 @@ class Main extends PluginBase implements Listener{
 	}
 
 	public function onPlayerMove(PlayerMoveEvent $event){
-		$pk = API::playerMove($event->getPlayer());
+		if($this->eid === null) return;
+		$pk = API::playerMove($event->getTo(), $this->eid);
+		$this->getServer()->broadcastPacket($event->getPlayer()->getLevel()->getPlayers(), $pk);
 		unset($event);
 	}
 
@@ -64,11 +66,9 @@ class Main extends PluginBase implements Listener{
 	 */
 	public function getText(Player $player){
 		$text = '';
-		if(!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . '
-
-' . TextFormat::RESET;
+		if(!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . PHP_EOL . PHP_EOL . TextFormat::RESET;
 		$currentMSG = $this->cmessages[$this->i % count($this->cmessages)];
-		@preg_match_all("/(\{.*?\})/ig", $currentMSG, $maybepercentage);
+		// @preg_match_all("/(\{.*?\})/ig", $currentMSG, $maybepercentage);
 		// print_r($maybepercentage);
 		// preg_match_all('/(\{(\d+)%\})/i', $maybepercentage[0], $percentages);
 		// print_r($percentages);
@@ -78,7 +78,7 @@ class Main extends PluginBase implements Listener{
 			$currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
 		}
 		$text .= $this->formatText($player, $currentMSG);
-		return $text;
+		return utf8_encode($text);
 	}
 
 	public function formatText(Player $player, $text){
@@ -88,6 +88,9 @@ class Main extends PluginBase implements Listener{
 		$text = str_replace("{level_players}", count($player->getLevel()->getPlayers()), $text);
 		$text = str_replace("{server_players}", count($player->getServer()->getOnlinePlayers()), $text);
 		$text = str_replace("{server_max_players}", $player->getServer()->getMaxPlayers(), $text);
+		$text = str_replace("{hour}", date('H'), $text);
+		$text = str_replace("{minute}", date('i'), $text);
+		$text = str_replace("{second}", date('s'), $text);
 		// preg_match_all ("/(\{.*?\})/ig", $text, $brackets);
 		
 		$text = str_replace("{BLACK}", "&0", $text);
