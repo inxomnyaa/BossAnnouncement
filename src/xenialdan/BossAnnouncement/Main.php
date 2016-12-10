@@ -78,7 +78,7 @@ class Main extends PluginBase implements Listener{
 			$currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
 		}
 		$text .= $this->formatText($player, $currentMSG);
-		return utf8_encode($text);
+		return $text;
 	}
 
 	public function formatText(Player $player, $text){
