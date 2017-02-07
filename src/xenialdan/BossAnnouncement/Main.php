@@ -18,10 +18,11 @@ use pocketmine\Player;
 
 class Main extends PluginBase implements Listener{
 	public $eid = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
+	/** @var BossBarAPI $API */
+	public $API;
 
 	public function onEnable(){
-		if(($API = $this->getServer()->getPluginManager()->getPlugin("BossBarAPI")) !== null){}
-		else{
+		if(($this->API = $this->getServer()->getPluginManager()->getPlugin("BossBarAPI")) === null){
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
@@ -54,8 +55,9 @@ class Main extends PluginBase implements Listener{
 
 	public function onPlayerMove(PlayerMoveEvent $event){
 		if($this->eid === null) return;
+		if($this->getConfig()->get("less-lag", true) && ($this->i % 5 == 0x00));//Bye Bye, Lag!
 		$pk = API::playerMove($event->getTo(), $this->eid);
-		$this->getServer()->broadcastPacket($event->getPlayer()->getLevel()->getPlayers(), $pk);
+		$event->getPlayer()->dataPacket($pk);//Bye Bye, Lag!
 		unset($event);
 	}
 

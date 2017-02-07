@@ -24,9 +24,11 @@ head-message: "We use BossAnnouncement by XenialDan!"
 changing-messages:
  - "{0%}{BOLD}{AQUA}Twitter{RESET}: XenialDan"
  - "{25%}{BOLD}{BLACK}You{RED}Tube{RESET}: XenialDan"
- - "{50%}{BOLD}{BLACK}GitHub{RESET}: XenialDan"
+ - "{50%}{BOLD}{BLACK}GitHub{RESET}: thebigsmileXD"
  - "{75%}{BOLD}Instagram{RESET}: XenialDan"
  - "{100%}{BOLD}PM-Forums{RESET}: thebigsmileXD"
 # How fast the messages switch in seconds
 change-speed: 5
+# Reduces lag even more by sending the movement only every 5 seconds
+less-lag: true
 ...

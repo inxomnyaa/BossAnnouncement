@@ -1,6 +1,6 @@
   name: BossAnnouncement
   main: xenialdan\BossAnnouncement\Main
-  version: 1.0.2
+  version: 1.1.0
   api: [2.0.0]
   load: POSTWORLD
   authors: [XenialDan]
