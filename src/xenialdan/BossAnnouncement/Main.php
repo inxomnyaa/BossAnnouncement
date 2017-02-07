@@ -13,16 +13,15 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\event\player\PlayerJoinEvent;
 use xenialdan\BossBarAPI\API;
 use pocketmine\utils\TextFormat;
-use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\Player;
 
-class Main extends PluginBase implements Listener{
+class Main extends PluginBase implements Listener {
 	public $eid = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
-	/** @var BossBarAPI $API */
+	/** @var API $API */
 	public $API;
 
-	public function onEnable(){
-		if(($this->API = $this->getServer()->getPluginManager()->getPlugin("BossBarAPI")) === null){
+	public function onEnable() {
+		if (($this->API = $this->getServer()->getPluginManager()->getPlugin("BossBarAPI")) === null) {
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
@@ -31,62 +30,50 @@ class Main extends PluginBase implements Listener{
 		$this->headBar = $this->getConfig()->get('head-message', '');
 		$this->cmessages = $this->getConfig()->get('changing-messages', []);
 		$this->changeSpeed = $this->getConfig()->get('change-speed', 0);
-		if($this->changeSpeed > 0) $this->getServer()->getScheduler()->scheduleRepeatingTask(new SendTask($this), 20 * $this->changeSpeed);
+		if ($this->changeSpeed > 0) $this->getServer()->getScheduler()->scheduleRepeatingTask(new SendTask($this), 20 * $this->changeSpeed);
 	}
 
-	public function onJoin(PlayerJoinEvent $ev){
-		if($this->eid === null){
+	public function onJoin(PlayerJoinEvent $ev) {
+		if ($this->eid === null) {
 			$this->eid = API::addBossBar([$ev->getPlayer()], 'Loading..');
-			$this->getServer()->getLogger()->debug($this->eid === NULL?'Couldn\'t add BossAnnouncement':'Successfully added BossAnnouncement with EID: ' . $this->eid);
-		}
-		else{
+			$this->getServer()->getLogger()->debug($this->eid === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->eid);
+		} else {
 			API::sendBossBarToPlayer($ev->getPlayer(), $this->eid, $this->getText($ev->getPlayer()));
 			$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->eid);
 		}
 	}
 
-	public function sendBossBar(){
-		if($this->eid === null) return;
+	public function sendBossBar() {
+		if ($this->eid === null) return;
 		$this->i++;
-		foreach($this->getServer()->getDefaultLevel()->getPlayers() as $player){
-			API::setTitle($this->getText($player), $this->eid);
+		foreach ($this->getServer()->getDefaultLevel()->getPlayers() as $player) {
+			API::setTitle($this->getText($player), $this->eid, [$player]);
 		}
-	}
-
-	public function onPlayerMove(PlayerMoveEvent $event){
-		if($this->eid === null) return;
-		if($this->getConfig()->get("less-lag", true) && ($this->i % 5 == 0x00));//Bye Bye, Lag!
-		$pk = API::playerMove($event->getTo(), $this->eid);
-		$event->getPlayer()->dataPacket($pk);//Bye Bye, Lag!
-		unset($event);
 	}
 
 	/**
 	 * Generates the output
 	 *
-	 * @param Player $player 
+	 * @param Player $player
+	 * @return string
 	 */
-	public function getText(Player $player){
+	public function getText(Player $player) {
 		$text = '';
-		if(!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . PHP_EOL . PHP_EOL . TextFormat::RESET;
+		if (!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . PHP_EOL . PHP_EOL . TextFormat::RESET;
 		$currentMSG = $this->cmessages[$this->i % count($this->cmessages)];
-		// @preg_match_all("/(\{.*?\})/ig", $currentMSG, $maybepercentage);
-		// print_r($maybepercentage);
-		// preg_match_all('/(\{(\d+)%\})/i', $maybepercentage[0], $percentages);
-		// print_r($percentages);
-		if(strpos($currentMSG, '%') > -1){
+		if (strpos($currentMSG, '%') > -1) {
 			$percentage = substr($currentMSG, 1, strpos($currentMSG, '%') - 1);
-			if(is_numeric($percentage)) API::setPercentage(intval($percentage) + 0.5, $this->eid);
+			if (is_numeric($percentage)) API::setPercentage(intval($percentage) + 0.5, $this->eid);
 			$currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
 		}
 		$text .= $this->formatText($player, $currentMSG);
 		return mb_convert_encoding($text, 'UTF-8');
 	}
 
-	public function formatText(Player $player, $text){
+	public function formatText(Player $player, $text) {
 		$text = str_replace("{display_name}", $player->getDisplayName(), $text);
 		$text = str_replace("{name}", $player->getName(), $text);
-		$text = str_replace("{world}", (($levelname = $player->getLevel()->getName()) === false?"":$levelname), $text);
+		$text = str_replace("{world}", (($levelname = $player->getLevel()->getName()) === false ? "" : $levelname), $text);
 		$text = str_replace("{level_players}", count($player->getLevel()->getPlayers()), $text);
 		$text = str_replace("{server_players}", count($player->getServer()->getOnlinePlayers()), $text);
 		$text = str_replace("{server_max_players}", $player->getServer()->getMaxPlayers(), $text);
@@ -94,7 +81,7 @@ class Main extends PluginBase implements Listener{
 		$text = str_replace("{minute}", date('i'), $text);
 		$text = str_replace("{second}", date('s'), $text);
 		// preg_match_all ("/(\{.*?\})/ig", $text, $brackets);
-		
+
 		$text = str_replace("{BLACK}", "&0", $text);
 		$text = str_replace("{DARK_BLUE}", "&1", $text);
 		$text = str_replace("{DARK_GREEN}", "&2", $text);
@@ -117,7 +104,7 @@ class Main extends PluginBase implements Listener{
 		$text = str_replace("{UNDERLINE}", "&n", $text);
 		$text = str_replace("{ITALIC}", "&o", $text);
 		$text = str_replace("{RESET}", "&r", $text);
-		
+
 		$text = str_replace("&0", TextFormat::BLACK, $text);
 		$text = str_replace("&1", TextFormat::DARK_BLUE, $text);
 		$text = str_replace("&2", TextFormat::DARK_GREEN, $text);
@@ -140,7 +127,7 @@ class Main extends PluginBase implements Listener{
 		$text = str_replace("&n", TextFormat::UNDERLINE, $text);
 		$text = str_replace("&o", TextFormat::ITALIC, $text);
 		$text = str_replace("&r", TextFormat::RESET, $text);
-		
+
 		return $text;
 	}
 }

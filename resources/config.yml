@@ -29,6 +29,10 @@ changing-messages:
  - "{100%}{BOLD}PM-Forums{RESET}: thebigsmileXD"
 # How fast the messages switch in seconds
 change-speed: 5
-# Reduces lag even more by sending the movement only every 5 seconds
-less-lag: true
+#Formatting strings:
+#{display_name}, {name}, {world}, {level_players}, {server_players}, {server_max_players}, {hour}, {minute}
+#{second}, {BLACK}, {DARK_BLUE}, {DARK_GREEN}, {DARK_AQUA}, {DARK_RED}, {DARK_PURPLE}, {GOLD}, {GRAY}
+#{DARK_GRAY}, {BLUE}, {GREEN}, {AQUA}, {RED}, {LIGHT_PURPLE}, {YELLOW}, {WHITE}, {OBFUSCATED}, {BOLD}
+#{STRIKETHROUGH}, {UNDERLINE}, {ITALIC}, {RESET}
+#&0, &1, &2, &3, &4, &5, &6, &7, &8, &9, &a, &b, &c, &d, &e, &f, &k, &l, &m, &n, &o, &r
 ...
