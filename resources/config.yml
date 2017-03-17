@@ -29,6 +29,14 @@ changing-messages:
  - "{100%}{BOLD}PM-Forums{RESET}: thebigsmileXD"
 # How fast the messages switch in seconds
 change-speed: 5
+# This changes the behaviour for multiple worlds
+# Mode 0: see the bar in every world
+# Mode 1: see ONLY in the worlds in the array
+# Mode 2: DON'T see in worlds in the array
+mode: 0
+# Worlds: use the worldname, seperate with " , "
+# Example: Mode 0, worlds: ["world", "lobby", "survival"]
+worlds: []
 #Formatting strings:
 #{display_name}, {name}, {world}, {level_players}, {server_players}, {server_max_players}, {hour}, {minute}
 #{second}, {BLACK}, {DARK_BLUE}, {DARK_GREEN}, {DARK_AQUA}, {DARK_RED}, {DARK_PURPLE}, {GOLD}, {GRAY}

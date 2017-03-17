@@ -8,12 +8,14 @@
  */
 namespace xenialdan\BossAnnouncement;
 
+use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
 use pocketmine\event\player\PlayerJoinEvent;
-use xenialdan\BossBarAPI\API;
-use pocketmine\utils\TextFormat;
+use pocketmine\level\Level;
 use pocketmine\Player;
+use pocketmine\plugin\PluginBase;
+use pocketmine\utils\TextFormat;
+use xenialdan\BossBarAPI\API;
 
 class Main extends PluginBase implements Listener {
 	public $eid = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
@@ -34,20 +36,44 @@ class Main extends PluginBase implements Listener {
 	}
 
 	public function onJoin(PlayerJoinEvent $ev) {
-		if ($this->eid === null) {
-			$this->eid = API::addBossBar([$ev->getPlayer()], 'Loading..');
-			$this->getServer()->getLogger()->debug($this->eid === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->eid);
-		} else {
-			API::sendBossBarToPlayer($ev->getPlayer(), $this->eid, $this->getText($ev->getPlayer()));
-			$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->eid);
+		if (in_array($ev->getPlayer()->getLevel(), $this->getWorlds())) {
+			if ($this->eid === null) {
+				$this->eid = API::addBossBar([$ev->getPlayer()], 'Loading..');
+				$this->getServer()->getLogger()->debug($this->eid === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->eid);
+			} else {
+				API::sendBossBarToPlayer($ev->getPlayer(), $this->eid, $this->getText($ev->getPlayer()));
+				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->eid);
+			}
 		}
 	}
+	//////
+	//fix mode 2
+
+	public function onLevelChange(EntityLevelChangeEvent $ev) {
+		if ($ev->isCancelled()) return;
+		if (in_array($ev->getTarget(), $this->getWorlds())) {
+			if ($this->eid === null) {
+				$this->eid = API::addBossBar([$ev->getEntity()], 'Loading..');
+				$this->getServer()->getLogger()->debug($this->eid === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->eid);
+			} else {
+				API::removeBossBar([$ev->getEntity()], $this->eid);
+				API::sendBossBarToPlayer($ev->getEntity(), $this->eid, $this->getText($ev->getEntity()));
+				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->eid);
+			}
+		} else {
+			API::removeBossBar([$ev->getEntity()], $this->eid);
+		}
+	}
+
 
 	public function sendBossBar() {
 		if ($this->eid === null) return;
 		$this->i++;
-		foreach ($this->getServer()->getDefaultLevel()->getPlayers() as $player) {
-			API::setTitle($this->getText($player), $this->eid, [$player]);
+		$worlds = $this->getWorlds();
+		foreach ($worlds as $world) {
+			foreach ($world->getPlayers() as $player) {
+				API::setTitle($this->getText($player), $this->eid, [$player]);
+			}
 		}
 	}
 
@@ -59,7 +85,7 @@ class Main extends PluginBase implements Listener {
 	 */
 	public function getText(Player $player) {
 		$text = '';
-		if (!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . PHP_EOL . PHP_EOL . TextFormat::RESET;
+		if (!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . "\n" . "\n" . TextFormat::RESET;
 		$currentMSG = $this->cmessages[$this->i % count($this->cmessages)];
 		if (strpos($currentMSG, '%') > -1) {
 			$percentage = substr($currentMSG, 1, strpos($currentMSG, '%') - 1);
@@ -129,5 +155,32 @@ class Main extends PluginBase implements Listener {
 		$text = str_replace("&r", TextFormat::RESET, $text);
 
 		return $text;
+	}
+
+	private function getWorlds() {
+		$mode = $this->getConfig()->get("mode", 0);
+		$worldnames = $this->getConfig()->get("worlds", []);
+		/** @var Level[] $worlds */
+		$worlds = [];
+		switch ($mode) {
+			case 0:
+				$worlds = $this->getServer()->getLevels();
+				break;
+			case 1:
+				foreach ($worldnames as $name) {
+					if (!is_null($level = $this->getServer()->getLevelByName($name))) $worlds[] = $level;
+					else $this->getLogger()->warning("Config error! World " . $name . " not found!");
+				}
+				break;
+			case 2:
+				$worlds = $this->getServer()->getLevels();
+				foreach ($worlds as $world) {
+					if (!in_array(strtolower($world->getName()), $worldnames)) {
+						$worlds[] = $world;
+					}
+				}
+				break;
+		}
+		return $worlds;
 	}
 }
