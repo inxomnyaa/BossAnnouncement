@@ -99,6 +99,9 @@ class Main extends PluginBase implements Listener {
 	public function formatText(Player $player, $text) {
 		$text = str_replace("{display_name}", $player->getDisplayName(), $text);
 		$text = str_replace("{name}", $player->getName(), $text);
+		$text = str_replace("{x}", $player->getFloorX(), $text);
+		$text = str_replace("{y}", $player->getFloorY(), $text);
+		$text = str_replace("{z}", $player->getFloorZ(), $text);
 		$text = str_replace("{world}", (($levelname = $player->getLevel()->getName()) === false ? "" : $levelname), $text);
 		$text = str_replace("{level_players}", count($player->getLevel()->getPlayers()), $text);
 		$text = str_replace("{server_players}", count($player->getServer()->getOnlinePlayers()), $text);
