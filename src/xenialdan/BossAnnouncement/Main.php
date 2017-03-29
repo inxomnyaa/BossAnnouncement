@@ -13,6 +13,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\level\Level;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use xenialdan\BossBarAPI\API;
@@ -21,6 +22,7 @@ class Main extends PluginBase implements Listener {
 	public $eid = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
 	/** @var API $API */
 	public $API;
+	private $plugins = [];
 
 	public function onEnable() {
 		if (($this->API = $this->getServer()->getPluginManager()->getPlugin("BossBarAPI")) === null) {
@@ -97,6 +99,8 @@ class Main extends PluginBase implements Listener {
 	}
 
 	public function formatText(Player $player, $text) {
+		$name = $player->getName();
+		$server = $this->getServer();
 		$text = str_replace("{display_name}", $player->getDisplayName(), $text);
 		$text = str_replace("{name}", $player->getName(), $text);
 		$text = str_replace("{x}", $player->getFloorX(), $text);
@@ -109,6 +113,14 @@ class Main extends PluginBase implements Listener {
 		$text = str_replace("{hour}", date('H'), $text);
 		$text = str_replace("{minute}", date('i'), $text);
 		$text = str_replace("{second}", date('s'), $text);
+		
+////////////////////////////////////////////////////Added by CortexPE///////////////////////////////////////////////////////////////////
+		$text = str_replace("{kills}", $server->getPluginManager()->getPlugin('KillChat')->getKills($name), $text);
+		$text = str_replace("{deaths}", $server->getPluginManager()->getPlugin('KillChat')->getDeaths($name), $text);
+		$text = str_replace("{faction}", $server->getPluginManager()->getPlugin('FactionsPro')->getPlayerFaction($name), $text);
+		$text = str_replace("{money}", $server->getPluginManager()->getPlugin('EconomyAPI')->myMoney($name), $text);
+		$text = str_replace("{pp_group}", $server->getPluginManager()->getPlugin('PurePerms')->getUserDataMgr()->getData($player)['group'], $text);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// preg_match_all ("/(\{.*?\})/ig", $text, $brackets);
 
 		$text = str_replace("{BLACK}", "&0", $text);
