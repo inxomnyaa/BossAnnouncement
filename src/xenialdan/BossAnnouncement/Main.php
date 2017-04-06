@@ -50,7 +50,7 @@ class Main extends PluginBase implements Listener {
 	//fix mode 2
 
 	public function onLevelChange(EntityLevelChangeEvent $ev) {
-		if ($ev->isCancelled()) return;
+		if ($ev->isCancelled() || !$ev->getEntity() instanceof Player) return;
 		if (in_array($ev->getTarget(), $this->getWorlds())) {
 			if ($this->eid === null) {
 				$this->eid = API::addBossBar([$ev->getEntity()], 'Loading..');
@@ -166,16 +166,16 @@ class Main extends PluginBase implements Listener {
 		/** @var Level[] $worlds */
 		$worlds = [];
 		switch ($mode) {
-			case 0:
+			case 0://Every
 				$worlds = $this->getServer()->getLevels();
 				break;
-			case 1:
+			case 1://only
 				foreach ($worldnames as $name) {
 					if (!is_null($level = $this->getServer()->getLevelByName($name))) $worlds[] = $level;
 					else $this->getLogger()->warning("Config error! World " . $name . " not found!");
 				}
 				break;
-			case 2:
+			case 2://not in
 				$worlds = $this->getServer()->getLevels();
 				foreach ($worlds as $world) {
 					if (!in_array(strtolower($world->getName()), $worldnames)) {
