@@ -18,7 +18,7 @@ use pocketmine\utils\TextFormat;
 use xenialdan\BossBarAPI\API;
 
 class Main extends PluginBase implements Listener {
-	public $eid = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
+	public $entityRuntimeId = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
 	/** @var API $API */
 	public $API;
 
@@ -37,12 +37,12 @@ class Main extends PluginBase implements Listener {
 
 	public function onJoin(PlayerJoinEvent $ev) {
 		if (in_array($ev->getPlayer()->getLevel(), $this->getWorlds())) {
-			if ($this->eid === null) {
-				$this->eid = API::addBossBar([$ev->getPlayer()], 'Loading..');
-				$this->getServer()->getLogger()->debug($this->eid === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->eid);
+			if ($this->entityRuntimeId === null) {
+				$this->entityRuntimeId = API::addBossBar([$ev->getPlayer()], 'Loading..');
+				$this->getServer()->getLogger()->debug($this->entityRuntimeId === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->entityRuntimeId);
 			} else {
-				API::sendBossBarToPlayer($ev->getPlayer(), $this->eid, $this->getText($ev->getPlayer()));
-				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->eid);
+				API::sendBossBarToPlayer($ev->getPlayer(), $this->entityRuntimeId, $this->getText($ev->getPlayer()));
+				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->entityRuntimeId);
 			}
 		}
 	}
@@ -52,27 +52,27 @@ class Main extends PluginBase implements Listener {
 	public function onLevelChange(EntityLevelChangeEvent $ev) {
 		if ($ev->isCancelled() || !$ev->getEntity() instanceof Player) return;
 		if (in_array($ev->getTarget(), $this->getWorlds())) {
-			if ($this->eid === null) {
-				$this->eid = API::addBossBar([$ev->getEntity()], 'Loading..');
-				$this->getServer()->getLogger()->debug($this->eid === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->eid);
+			if ($this->entityRuntimeId === null) {
+				$this->entityRuntimeId = API::addBossBar([$ev->getEntity()], 'Loading..');
+				$this->getServer()->getLogger()->debug($this->entityRuntimeId === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->entityRuntimeId);
 			} else {
-				API::removeBossBar([$ev->getEntity()], $this->eid);
-				API::sendBossBarToPlayer($ev->getEntity(), $this->eid, $this->getText($ev->getEntity()));
-				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->eid);
+				API::removeBossBar([$ev->getEntity()], $this->entityRuntimeId);
+				API::sendBossBarToPlayer($ev->getEntity(), $this->entityRuntimeId, $this->getText($ev->getEntity()));
+				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->entityRuntimeId);
 			}
 		} else {
-			API::removeBossBar([$ev->getEntity()], $this->eid);
+			API::removeBossBar([$ev->getEntity()], $this->entityRuntimeId);
 		}
 	}
 
 
 	public function sendBossBar() {
-		if ($this->eid === null) return;
+		if ($this->entityRuntimeId === null) return;
 		$this->i++;
 		$worlds = $this->getWorlds();
 		foreach ($worlds as $world) {
 			foreach ($world->getPlayers() as $player) {
-				API::setTitle($this->getText($player), $this->eid, [$player]);
+				API::setTitle($this->getText($player), $this->entityRuntimeId, [$player]);
 			}
 		}
 	}
@@ -89,7 +89,7 @@ class Main extends PluginBase implements Listener {
 		$currentMSG = $this->cmessages[$this->i % count($this->cmessages)];
 		if (strpos($currentMSG, '%') > -1) {
 			$percentage = substr($currentMSG, 1, strpos($currentMSG, '%') - 1);
-			if (is_numeric($percentage)) API::setPercentage(intval($percentage) + 0.5, $this->eid);
+			if (is_numeric($percentage)) API::setPercentage(intval($percentage) + 0.5, $this->entityRuntimeId);
 			$currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
 		}
 		$text .= $this->formatText($player, $currentMSG);
