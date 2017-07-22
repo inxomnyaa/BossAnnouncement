@@ -7,7 +7,7 @@ use pocketmine\plugin\Plugin;
 
 class SendTask extends PluginTask{
 
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		$this->getOwner()->sendBossBar();
 	}
 
