@@ -96,7 +96,11 @@ class Main extends PluginBase implements Listener {
 		return mb_convert_encoding($text, 'UTF-8');
 	}
 
-	public function formatText(Player $player, $text) {
+	/**
+	 * Formats the string
+	 *
+	 * @return string */
+	public function formatText(Player $player, string $text) {
 		$text = str_replace("{display_name}", $player->getDisplayName(), $text);
 		$text = str_replace("{name}", $player->getName(), $text);
 		$text = str_replace("{x}", $player->getFloorX(), $text);
@@ -160,6 +164,7 @@ class Main extends PluginBase implements Listener {
 		return $text;
 	}
 
+	/** @return Level[] $worlds */
 	private function getWorlds() {
 		$mode = $this->getConfig()->get("mode", 0);
 		$worldnames = $this->getConfig()->get("worlds", []);
