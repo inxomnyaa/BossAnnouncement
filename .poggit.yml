@@ -5,6 +5,6 @@ projects:
   BossAnnouncement:
     path: ""
     libs:
-      - src: XenialDan/bossbarapi/bossbarapi
-        version: 5.0.0
+      - src: thebigsmilexd/bossbarapi/bossbarapi
+        version: ^5.0.0
 ...
