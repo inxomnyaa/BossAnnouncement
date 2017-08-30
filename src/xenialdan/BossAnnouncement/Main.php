@@ -5,7 +5,10 @@
  * A plugin by XenialDan aka thebigsmileXD
  * http://github.com/thebigsmileXD/BossAnnouncement
  * A simple boss bar tile plugin using my BossBarAPI
+ * BossBarAPI virion: 
+ * http://github.com/thebigsmileXD/BossBarAPI
  */
+
 namespace xenialdan\BossAnnouncement;
 
 use pocketmine\event\entity\EntityLevelChangeEvent;
@@ -17,7 +20,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use xenialdan\BossBarAPI\API;
 
-class Main extends PluginBase implements Listener {
+class Main extends PluginBase implements Listener{
 	public $entityRuntimeId = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
 	/** @var API $API */
 	public $API;
@@ -31,12 +34,12 @@ class Main extends PluginBase implements Listener {
 		if ($this->changeSpeed > 0) $this->getServer()->getScheduler()->scheduleRepeatingTask(new SendTask($this), 20 * $this->changeSpeed);
 	}
 
-	public function onJoin(PlayerJoinEvent $ev) {
-		if (in_array($ev->getPlayer()->getLevel(), $this->getWorlds())) {
-			if ($this->entityRuntimeId === null) {
+	public function onJoin(PlayerJoinEvent $ev){
+		if (in_array($ev->getPlayer()->getLevel(), $this->getWorlds())){
+			if ($this->entityRuntimeId === null){
 				$this->entityRuntimeId = API::addBossBar([$ev->getPlayer()], 'Loading..');
 				$this->getServer()->getLogger()->debug($this->entityRuntimeId === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->entityRuntimeId);
-			} else {
+			} else{
 				API::sendBossBarToPlayer($ev->getPlayer(), $this->entityRuntimeId, $this->getText($ev->getPlayer()));
 				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->entityRuntimeId);
 			}
@@ -45,29 +48,29 @@ class Main extends PluginBase implements Listener {
 	//////
 	//fix mode 2
 
-	public function onLevelChange(EntityLevelChangeEvent $ev) {
+	public function onLevelChange(EntityLevelChangeEvent $ev){
 		if ($ev->isCancelled() || !$ev->getEntity() instanceof Player) return;
-		if (in_array($ev->getTarget(), $this->getWorlds())) {
-			if ($this->entityRuntimeId === null) {
+		if (in_array($ev->getTarget(), $this->getWorlds())){
+			if ($this->entityRuntimeId === null){
 				$this->entityRuntimeId = API::addBossBar([$ev->getEntity()], 'Loading..');
 				$this->getServer()->getLogger()->debug($this->entityRuntimeId === NULL ? 'Couldn\'t add BossAnnouncement' : 'Successfully added BossAnnouncement with EID: ' . $this->entityRuntimeId);
-			} else {
+			} else{
 				API::removeBossBar([$ev->getEntity()], $this->entityRuntimeId);
 				API::sendBossBarToPlayer($ev->getEntity(), $this->entityRuntimeId, $this->getText($ev->getEntity()));
 				$this->getServer()->getLogger()->debug('Sendt BossAnnouncement with existing EID: ' . $this->entityRuntimeId);
 			}
-		} else {
+		} else{
 			API::removeBossBar([$ev->getEntity()], $this->entityRuntimeId);
 		}
 	}
 
 
-	public function sendBossBar() {
+	public function sendBossBar(){
 		if ($this->entityRuntimeId === null) return;
 		$this->i++;
 		$worlds = $this->getWorlds();
-		foreach ($worlds as $world) {
-			foreach ($world->getPlayers() as $player) {
+		foreach ($worlds as $world){
+			foreach ($world->getPlayers() as $player){
 				API::setTitle($this->getText($player), $this->entityRuntimeId, [$player]);
 			}
 		}
@@ -79,11 +82,11 @@ class Main extends PluginBase implements Listener {
 	 * @param Player $player
 	 * @return string
 	 */
-	public function getText(Player $player) {
+	public function getText(Player $player){
 		$text = '';
 		if (!empty($this->headBar)) $text .= $this->formatText($player, $this->headBar) . "\n" . "\n" . TextFormat::RESET;
 		$currentMSG = $this->cmessages[$this->i % count($this->cmessages)];
-		if (strpos($currentMSG, '%') > -1) {
+		if (strpos($currentMSG, '%') > -1){
 			$percentage = substr($currentMSG, 1, strpos($currentMSG, '%') - 1);
 			if (is_numeric($percentage)) API::setPercentage(intval($percentage) + 0.5, $this->entityRuntimeId);
 			$currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
@@ -95,8 +98,11 @@ class Main extends PluginBase implements Listener {
 	/**
 	 * Formats the string
 	 *
-	 * @return string */
-	public function formatText(Player $player, string $text) {
+	 * @param Player $player
+	 * @param string $text
+	 * @return string
+	 */
+	public function formatText(Player $player, string $text){
 		$text = str_replace("{display_name}", $player->getDisplayName(), $text);
 		$text = str_replace("{name}", $player->getName(), $text);
 		$text = str_replace("{x}", $player->getFloorX(), $text);
@@ -161,25 +167,25 @@ class Main extends PluginBase implements Listener {
 	}
 
 	/** @return Level[] $worlds */
-	private function getWorlds() {
+	private function getWorlds(){
 		$mode = $this->getConfig()->get("mode", 0);
 		$worldnames = $this->getConfig()->get("worlds", []);
 		/** @var Level[] $worlds */
 		$worlds = [];
-		switch ($mode) {
+		switch ($mode){
 			case 0://Every
 				$worlds = $this->getServer()->getLevels();
 				break;
 			case 1://only
-				foreach ($worldnames as $name) {
+				foreach ($worldnames as $name){
 					if (!is_null($level = $this->getServer()->getLevelByName($name))) $worlds[] = $level;
 					else $this->getLogger()->warning("Config error! World " . $name . " not found!");
 				}
 				break;
 			case 2://not in
 				$worlds = $this->getServer()->getLevels();
-				foreach ($worlds as $world) {
-					if (!in_array(strtolower($world->getName()), $worldnames)) {
+				foreach ($worlds as $world){
+					if (!in_array(strtolower($world->getName()), $worldnames)){
 						$worlds[] = $world;
 					}
 				}
