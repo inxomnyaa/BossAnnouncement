@@ -25,10 +25,6 @@ class Main extends PluginBase implements Listener{
 	public $API;
 
 	public function onEnable(){
-		if (($this->API = $this->getServer()->getPluginManager()->getPlugin("BossBarAPI")) === null){
-			$this->getServer()->getPluginManager()->disablePlugin($this);
-			return;
-		}
 		$this->saveDefaultConfig();
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->headBar = $this->getConfig()->get('head-message', '');
