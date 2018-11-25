@@ -17,6 +17,7 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use xenialdan\BossBarAPI\API;
+use xenialdan\BossBarAPI\SendTask;
 
 class Main extends PluginBase implements Listener{
 	public $entityRuntimeId = null, $headBar = '', $cmessages = [], $changeSpeed = 0, $i = 0;
@@ -33,7 +34,7 @@ class Main extends PluginBase implements Listener{
 		$this->headBar = $this->getConfig()->get('head-message', '');
 		$this->cmessages = $this->getConfig()->get('changing-messages', []);
 		$this->changeSpeed = $this->getConfig()->get('change-speed', 0);
-		if ($this->changeSpeed > 0) $this->getServer()->getScheduler()->scheduleRepeatingTask(new SendTask($this), 20 * $this->changeSpeed);
+        if ($this->changeSpeed > 0) $this->getScheduler()->scheduleRepeatingTask(new SendTask($this), 20 * $this->changeSpeed);
 	}
 
 	public function onJoin(PlayerJoinEvent $ev){
