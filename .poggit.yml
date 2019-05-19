@@ -3,6 +3,6 @@ projects:
   BossAnnouncement:
     path: ""
     libs:
-      - src: thebigsmilexd/BossBarAPI/BossBarAPI
-        version: ^5.0.0
+    - src: thebigsmilexd/apibossbar/apibossbar
+      version: ^0.0.2
 ...
