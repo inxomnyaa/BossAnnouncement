@@ -15,6 +15,7 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\Task;
 use pocketmine\utils\TextFormat;
+use onebone\economyapi\EconomyAPI;
 use xenialdan\apibossbar\DiverseBossBar;
 
 class Loader extends PluginBase implements Listener
