@@ -1,0 +1,10 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/notacoderr/BossAnnouncement
+branches:
+- master
+projects:
+  BossAnnouncement:
+    path: ""
+    libs:
+      - src: notacoderr/xenialdan/apibossbar
+        version: ^0.0.6
+...
