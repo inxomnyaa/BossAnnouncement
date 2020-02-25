@@ -2,7 +2,7 @@
 name: BossAnnouncement
 main: xenialdan\BossAnnouncement\Loader
 version: 2.0.0
-api: [3.9, 4.0.0]
+api: [3.9,3.10,3.11]
 load: POSTWORLD
 authors:
 - XenialDan
