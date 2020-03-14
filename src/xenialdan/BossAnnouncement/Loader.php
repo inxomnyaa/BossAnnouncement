@@ -10,6 +10,7 @@
 namespace xenialdan\BossAnnouncement;
 
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -180,5 +181,9 @@ class Loader extends PluginBase implements Listener
                 break;
         }
         return $worlds;
+    }
+
+    public function onDeath(PlayerDeathEvent $ev) {
+        $this->bar->removePlayer($ev->getPlayer())->addPlayer($ev->getPlayer());
     }
 }
