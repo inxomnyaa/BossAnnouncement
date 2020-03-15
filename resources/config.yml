@@ -2,46 +2,46 @@
 # Example Look
 # First 3 seconds:
 #
-# Welcome to the WolvesFortress.de Server, {player}!
+#        Welcome to the server, {player}!
 # ================----------------------------------
-#        The best server, the best minigames!
+#        The coolest server in the world!
 #
 # Next 3 seconds:
 #
-# Welcome to the WolvesFortress.de Server, {player}!
+#       Welcome to the server, {player}!
 # =================================-----------------
-#      Visit our website: wolvesfortress.de!
+#      Check out my GitHub: thebigsmileXD!
 #
-# If you don't define the top message, the changing messages will be displayed there.
+# If you leave the top message empty, the changing messages will be displayed above the bar.
 #
 #         Changing messages are up here :P
 # ==================================================
+#
 head-message: "We use BossAnnouncement by XenialDan!"
 # Changing messages are here
 # To set the percentage of the bar add {number%} before the message!
-# Otherwise it takes the percentage that was there before.
+# Otherwise it will keep the previous value, so if you want it to be always at 100%, set {100%} in the first line.
 # Example for a 25% filled: "{25%}This is a quarter filled bar"
 changing-messages:
  - "{0%}{BOLD}{AQUA}Twitter{RESET}: XenialDan"
- - "{25%}{BOLD}{BLACK}You{RED}Tube{RESET}: XenialDan"
- - "{50%}{BOLD}{BLACK}GitHub{RESET}: thebigsmileXD"
- - "{75%}{BOLD}Instagram{RESET}: XenialDan"
+ - "{33%}{BOLD}{BLACK}You{RED}Tube{RESET}: XenialDan"
+ - "{66%}{BOLD}{BLACK}GitHub{RESET}: thebigsmileXD"
  - "{100%}{BOLD}PM-Forums{RESET}: thebigsmileXD"
 # How fast the messages switch in seconds. 1 is minimum
 change-speed: 5
 # This changes the behaviour for multiple worlds
-# Mode 0: see the bar in every world
-# Mode 1: see ONLY in the worlds in the array
-# Mode 2: DON'T see in worlds in the array
+# Mode 0: See the bar in every world
+# Mode 1: Display ONLY in the worlds in the array
+# Mode 2: Exclude worlds from the array
 mode: 0
 # Worlds: use the worldname, seperate with " , "
-# Example: Mode 0, worlds: ["world", "lobby", "survival"]
+# Example: Mode 1, worlds: ["world", "lobby", "survival"]
 worlds: []
-#Formatting strings:
-#{display_name}, {name}, {world}, {x}, {y}, {z}, {level_players}, {server_players}, {server_max_players},
-#{hour}, {minute}, {second}
-#{BLACK}, {DARK_BLUE}, {DARK_GREEN}, {DARK_AQUA}, {DARK_RED}, {DARK_PURPLE}, {GOLD}, {GRAY},
-#{DARK_GRAY}, {BLUE}, {GREEN}, {AQUA}, {RED}, {LIGHT_PURPLE}, {YELLOW}, {WHITE}, {OBFUSCATED}, {BOLD}
-#{STRIKETHROUGH}, {UNDERLINE}, {ITALIC}, {RESET}
-#&0, &1, &2, &3, &4, &5, &6, &7, &8, &9, &a, &b, &c, &d, &e, &f, &k, &l, &m, &n, &o, &r
+# Formatting strings:
+# {display_name}, {name}, {world}, {x}, {y}, {z}, {level_players}, {server_players}, {server_max_players},
+# {hour}, {minute}, {second}
+# {BLACK}, {DARK_BLUE}, {DARK_GREEN}, {DARK_AQUA}, {DARK_RED}, {DARK_PURPLE}, {GOLD}, {GRAY},
+# {DARK_GRAY}, {BLUE}, {GREEN}, {AQUA}, {RED}, {LIGHT_PURPLE}, {YELLOW}, {WHITE}, {OBFUSCATED}, {BOLD}
+# {STRIKETHROUGH}, {UNDERLINE}, {ITALIC}, {RESET}
+# &0, &1, &2, &3, &4, &5, &6, &7, &8, &9, &a, &b, &c, &d, &e, &f, &k, &l, &m, &n, &o, &r
 ...

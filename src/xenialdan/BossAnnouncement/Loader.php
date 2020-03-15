@@ -11,7 +11,6 @@ namespace xenialdan\BossAnnouncement;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
-use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\Task;
@@ -46,16 +45,16 @@ class Loader extends PluginBase implements Listener
         $this->subTitles = $this->getConfig()->get('changing-messages', []);
         $this->changeSpeed = max(1, $this->getConfig()->get('change-speed', 1));
         $this->bar = (new DiverseBossBar())->setTitle($this->title);//setTitle needed?
-        $this->getScheduler()->scheduleRepeatingTask(new class extends Task
-        {
+        $this->getScheduler()->scheduleRepeatingTask(new class extends Task {
             public function onRun(int $currentTick)
             {
                 Loader::getInstance()->i++;
                 if (Loader::getInstance()->i >= count(Loader::getInstance()->subTitles)) Loader::getInstance()->i = 0;
-                foreach (Loader::getInstance()->getWorlds() as $world) {
-                    foreach ($world->getPlayers() as $player) {
+                foreach (Loader::getInstance()->bar->getPlayers() as $player) {
+                    if ($player->isOnline() && Loader::getInstance()->isWorldEnabled($player->getLevel()->getName())) {
                         Loader::getInstance()->setText($player);
                     }
+
                 }
             }
         }, 20 * $this->changeSpeed);
@@ -154,36 +153,33 @@ class Loader extends PluginBase implements Listener
         return $text;
     }
 
-    /** @return Level[] $worlds */
-    public function getWorlds()
+    /**
+     * @param string $levelName
+     * @return bool
+     */
+    public function isWorldEnabled(string $levelName): bool
     {
         $mode = $this->getConfig()->get("mode", 0);
-        $worldnames = $this->getConfig()->get("worlds", []);
-        /** @var Level[] $worlds */
-        $worlds = [];
+        $configWorlds = array_map(function (string $worldName):string {
+            return strtolower(TextFormat::clean($worldName));
+        }, $this->getConfig()->get("worlds", []));
+        $levelName = strtolower(TextFormat::clean($levelName));
         switch ($mode) {
-            case 0://Every
-                $worlds = $this->getServer()->getLevels();
+            case 0://Every world
+                return true;
                 break;
-            case 1://only
-                foreach ($worldnames as $name) {
-                    if (!is_null($level = $this->getServer()->getLevelByName($name))) $worlds[] = $level;
-                    else $this->getLogger()->warning("Config error! World " . $name . " not found!");
-                }
+            case 1://Only config worlds
+                return in_array($levelName, $configWorlds);
                 break;
-            case 2://not in
-                $worlds = $this->getServer()->getLevels();
-                foreach ($worlds as $world) {
-                    if (!in_array(strtolower($world->getName()), $worldnames)) {
-                        $worlds[] = $world;
-                    }
-                }
+            case 2://Exclude config worlds
+                return !in_array($levelName, $configWorlds);
                 break;
         }
-        return $worlds;
+        return false;
     }
 
-    public function onDeath(PlayerDeathEvent $ev) {
+    public function onDeath(PlayerDeathEvent $ev)
+    {
         $this->bar->removePlayer($ev->getPlayer())->addPlayer($ev->getPlayer());
     }
 }
