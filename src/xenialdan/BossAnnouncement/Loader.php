@@ -13,6 +13,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\plugin\PluginException;
 use pocketmine\scheduler\Task;
 use pocketmine\utils\TextFormat;
 use xenialdan\apibossbar\DiverseBossBar;
@@ -20,11 +21,11 @@ use xenialdan\apibossbar\DiverseBossBar;
 class Loader extends PluginBase implements Listener
 {
     /** @var DiverseBossBar */
-    public $bar = null;
+    public $bar;
     public $title = '', $subTitles = [], $changeSpeed = 0, $i = 0;
     public static $instance;
 
-    public function onLoad()
+    public function onLoad(): void
     {
         self::$instance = $this;
     }
@@ -32,12 +33,15 @@ class Loader extends PluginBase implements Listener
     /**
      * @return self
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         return self::$instance;
     }
 
-    public function onEnable()
+    /**
+     * @throws PluginException
+     */
+    public function onEnable(): void
     {
         $this->saveDefaultConfig();
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
@@ -46,10 +50,12 @@ class Loader extends PluginBase implements Listener
         $this->changeSpeed = max(1, $this->getConfig()->get('change-speed', 1));
         $this->bar = (new DiverseBossBar())->setTitle($this->title);//setTitle needed?
         $this->getScheduler()->scheduleRepeatingTask(new class extends Task {
-            public function onRun(int $currentTick)
+            public function onRun(int $currentTick): void
             {
                 Loader::getInstance()->i++;
-                if (Loader::getInstance()->i >= count(Loader::getInstance()->subTitles)) Loader::getInstance()->i = 0;
+                if (Loader::getInstance()->i >= count(Loader::getInstance()->subTitles)) {
+                    Loader::getInstance()->i = 0;
+                }
                 foreach (Loader::getInstance()->bar->getPlayers() as $player) {
                     if ($player->isOnline() && Loader::getInstance()->isWorldEnabled($player->getLevel()->getName())) {
                         Loader::getInstance()->setText($player);
@@ -70,7 +76,9 @@ class Loader extends PluginBase implements Listener
         $currentMSG = $this->subTitles[$this->i % count($this->subTitles)];
         if (strpos($currentMSG, '%') > -1) {
             $percentage = substr($currentMSG, 1, strpos($currentMSG, '%') - 1);
-            if (is_numeric($percentage)) $this->bar->setPercentageFor([$player], $percentage / 100);
+            if (is_numeric($percentage)) {
+                $this->bar->setPercentageFor([$player], $percentage / 100);
+            }
             $currentMSG = substr($currentMSG, strpos($currentMSG, '%') + 2);
         }
         if (!empty($this->title)) {
@@ -87,68 +95,12 @@ class Loader extends PluginBase implements Listener
      * @param string $text
      * @return string
      */
-    public function formatText(Player $player, string $text)
+    public function formatText(Player $player, string $text): string
     {
-        $text = str_replace("{display_name}", $player->getDisplayName(), $text);
-        $text = str_replace("{name}", $player->getName(), $text);
-        $text = str_replace("{x}", $player->getFloorX(), $text);
-        $text = str_replace("{y}", $player->getFloorY(), $text);
-        $text = str_replace("{z}", $player->getFloorZ(), $text);
-        $text = str_replace("{world}", !is_null($level = $player->getLevel()) ? $level->getName() : "", $text);
-        $text = str_replace("{level_players}", count($player->getLevel()->getPlayers()), $text);
-        $text = str_replace("{server_players}", count($player->getServer()->getOnlinePlayers()), $text);
-        $text = str_replace("{server_max_players}", $player->getServer()->getMaxPlayers(), $text);
-        $text = str_replace("{hour}", date('H'), $text);
-        $text = str_replace("{minute}", date('i'), $text);
-        $text = str_replace("{second}", date('s'), $text);
         // preg_match_all ("/(\{.*?\})/ig", $text, $brackets);
 
         //TODO auto function
-        $text = str_replace("{BLACK}", "&0", $text);
-        $text = str_replace("{DARK_BLUE}", "&1", $text);
-        $text = str_replace("{DARK_GREEN}", "&2", $text);
-        $text = str_replace("{DARK_AQUA}", "&3", $text);
-        $text = str_replace("{DARK_RED}", "&4", $text);
-        $text = str_replace("{DARK_PURPLE}", "&5", $text);
-        $text = str_replace("{GOLD}", "&6", $text);
-        $text = str_replace("{GRAY}", "&7", $text);
-        $text = str_replace("{DARK_GRAY}", "&8", $text);
-        $text = str_replace("{BLUE}", "&9", $text);
-        $text = str_replace("{GREEN}", "&a", $text);
-        $text = str_replace("{AQUA}", "&b", $text);
-        $text = str_replace("{RED}", "&c", $text);
-        $text = str_replace("{LIGHT_PURPLE}", "&d", $text);
-        $text = str_replace("{YELLOW}", "&e", $text);
-        $text = str_replace("{WHITE}", "&f", $text);
-        $text = str_replace("{OBFUSCATED}", "&k", $text);
-        $text = str_replace("{BOLD}", "&l", $text);
-        $text = str_replace("{STRIKETHROUGH}", "&m", $text);
-        $text = str_replace("{UNDERLINE}", "&n", $text);
-        $text = str_replace("{ITALIC}", "&o", $text);
-        $text = str_replace("{RESET}", "&r", $text);
-
-        $text = str_replace("&0", TextFormat::BLACK, $text);
-        $text = str_replace("&1", TextFormat::DARK_BLUE, $text);
-        $text = str_replace("&2", TextFormat::DARK_GREEN, $text);
-        $text = str_replace("&3", TextFormat::DARK_AQUA, $text);
-        $text = str_replace("&4", TextFormat::DARK_RED, $text);
-        $text = str_replace("&5", TextFormat::DARK_PURPLE, $text);
-        $text = str_replace("&6", TextFormat::GOLD, $text);
-        $text = str_replace("&7", TextFormat::GRAY, $text);
-        $text = str_replace("&8", TextFormat::DARK_GRAY, $text);
-        $text = str_replace("&9", TextFormat::BLUE, $text);
-        $text = str_replace("&a", TextFormat::GREEN, $text);
-        $text = str_replace("&b", TextFormat::AQUA, $text);
-        $text = str_replace("&c", TextFormat::RED, $text);
-        $text = str_replace("&d", TextFormat::LIGHT_PURPLE, $text);
-        $text = str_replace("&e", TextFormat::YELLOW, $text);
-        $text = str_replace("&f", TextFormat::WHITE, $text);
-        $text = str_replace("&k", TextFormat::OBFUSCATED, $text);
-        $text = str_replace("&l", TextFormat::BOLD, $text);
-        $text = str_replace("&m", TextFormat::STRIKETHROUGH, $text);
-        $text = str_replace("&n", TextFormat::UNDERLINE, $text);
-        $text = str_replace("&o", TextFormat::ITALIC, $text);
-        $text = str_replace("&r", TextFormat::RESET, $text);
+        $text = str_replace(['{display_name}', '{name}', '{x}', '{y}', '{z}', '{world}', '{level_players}', '{server_players}', '{server_max_players}', '{hour}', '{minute}', '{second}', '{BLACK}', '{DARK_BLUE}', '{DARK_GREEN}', '{DARK_AQUA}', '{DARK_RED}', '{DARK_PURPLE}', '{GOLD}', '{GRAY}', '{DARK_GRAY}', '{BLUE}', '{GREEN}', '{AQUA}', '{RED}', '{LIGHT_PURPLE}', '{YELLOW}', '{WHITE}', '{OBFUSCATED}', '{BOLD}', '{STRIKETHROUGH}', '{UNDERLINE}', '{ITALIC}', '{RESET}', '&0', '&1', '&2', '&3', '&4', '&5', '&6', '&7', '&8', '&9', '&a', '&b', '&c', '&d', '&e', '&f', '&k', '&l', '&m', '&n', '&o', '&r'], [$player->getDisplayName(), $player->getName(), $player->getFloorX(), $player->getFloorY(), $player->getFloorZ(), ($level = $player->getLevel()) !== null ? $level->getName() : '', count($player->getLevel()->getPlayers()), count($player->getServer()->getOnlinePlayers()), $player->getServer()->getMaxPlayers(), date('H'), date('i'), date('s'), '&0', '&1', '&2', '&3', '&4', '&5', '&6', '&7', '&8', '&9', '&a', '&b', '&c', '&d', '&e', '&f', '&k', '&l', '&m', '&n', '&o', '&r', TextFormat::BLACK, TextFormat::DARK_BLUE, TextFormat::DARK_GREEN, TextFormat::DARK_AQUA, TextFormat::DARK_RED, TextFormat::DARK_PURPLE, TextFormat::GOLD, TextFormat::GRAY, TextFormat::DARK_GRAY, TextFormat::BLUE, TextFormat::GREEN, TextFormat::AQUA, TextFormat::RED, TextFormat::LIGHT_PURPLE, TextFormat::YELLOW, TextFormat::WHITE, TextFormat::OBFUSCATED, TextFormat::BOLD, TextFormat::STRIKETHROUGH, TextFormat::UNDERLINE, TextFormat::ITALIC, TextFormat::RESET], $text);
 
         return $text;
     }
@@ -159,20 +111,20 @@ class Loader extends PluginBase implements Listener
      */
     public function isWorldEnabled(string $levelName): bool
     {
-        $mode = $this->getConfig()->get("mode", 0);
-        $configWorlds = array_map(function (string $worldName):string {
+        $mode = $this->getConfig()->get('mode', 0);
+        $configWorlds = array_map(static function (string $worldName): string {
             return strtolower(TextFormat::clean($worldName));
-        }, $this->getConfig()->get("worlds", []));
+        }, $this->getConfig()->get('worlds', []));
         $levelName = strtolower(TextFormat::clean($levelName));
         switch ($mode) {
             case 0://Every world
                 return true;
                 break;
             case 1://Only config worlds
-                return in_array($levelName, $configWorlds);
+                return in_array($levelName, $configWorlds, true);
                 break;
             case 2://Exclude config worlds
-                return !in_array($levelName, $configWorlds);
+                return !in_array($levelName, $configWorlds, true);
                 break;
         }
         return false;
